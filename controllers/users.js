@@ -1,6 +1,8 @@
 const { StatusCodes } = require('http-status-codes')
 const { checkFields, hashPassword, createJwt } = require('./utils')
 const pool = require('../db/db')
+const { BadRequestError, UnAuthorizedError } = require('../errors')
+const bcrypt = require('bcryptjs')
 
 const register = async (req, res) => {
   const { email, name, password } = req.body
@@ -18,6 +20,27 @@ const register = async (req, res) => {
   res.status(StatusCodes.CREATED).json({ user: { name: fullName }, token })
 }
 
+const login = async (req, res) => {
+  const { email, password } = req.body
+  if (!email || !password) {
+    throw new BadRequestError('Please provide an email or password')
+  }
+  const user = await pool.query(
+    'SELECT * FROM users WHERE email = $1', [email]
+  )
+  if (!user) {
+    throw new UnAuthorizedError('Incorrect username or password')
+  }
+  const { id, name, password: rawPassword } = user.rows[0]
+  const isPasswordCorrect = await bcrypt.compare(password, rawPassword)
+  if (!isPasswordCorrect) {
+    throw new UnAuthorizedError('Incorrect username or password')
+  }
+  const token = createJwt(id, name)
+  res.status(StatusCodes.CREATED).json({ user: { name }, token })
+}
+
 module.exports = {
-  register
+  register,
+  login
 }

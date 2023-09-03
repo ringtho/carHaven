@@ -20,6 +20,10 @@ const hashPassword = async (password) => {
   return await bcrypt.hash(password, salt)
 }
 
+const decodePassword = async (rawPassword, password) => {
+  return await bcrypt.compare(rawPassword, password)
+}
+
 const createJwt = (id, name) => {
   const token = jwt.sign(
     { userId: id, name },
@@ -32,5 +36,6 @@ const createJwt = (id, name) => {
 module.exports = {
   checkFields,
   createJwt,
-  hashPassword
+  hashPassword,
+  decodePassword
 }
