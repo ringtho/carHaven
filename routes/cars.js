@@ -5,7 +5,8 @@ const {
   getAllCars,
   createCar,
   getSingleCar,
-  updateCar
+  updateCar,
+  deleteCar
 } = require('../controllers/cars')
 
 router.route('/')
@@ -14,5 +15,6 @@ router.route('/')
 router.route('/:carId')
   .get(getSingleCar)
   .put(authMiddleware, updateCar)
+  .delete(authMiddleware, deleteCar)
 
 module.exports = router
