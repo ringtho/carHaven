@@ -1,10 +1,18 @@
 const express = require('express')
 const router = express.Router()
-const authMiddlware = require('../middleware/authentication')
-const { getAllCars, createCar } = require('../controllers/cars')
+const authMiddleware = require('../middleware/authentication')
+const {
+  getAllCars,
+  createCar,
+  getSingleCar,
+  updateCar
+} = require('../controllers/cars')
 
 router.route('/')
-  .post(authMiddlware, createCar)
+  .post(authMiddleware, createCar)
   .get(getAllCars)
+router.route('/:carId')
+  .get(getSingleCar)
+  .put(authMiddleware, updateCar)
 
 module.exports = router

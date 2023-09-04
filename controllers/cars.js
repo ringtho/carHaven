@@ -2,6 +2,8 @@ const { StatusCodes } = require('http-status-codes')
 const { checkCarFields } = require('./utils')
 const pool = require('../db/db')
 
+const { NotFoundError } = require('../errors')
+
 const createCar = async (req, res) => {
   const { userId } = req.user
   const { make, model, description, rentalPrice } = req.body
@@ -26,7 +28,48 @@ const getAllCars = async (req, res) => {
   })
 }
 
+const getSingleCar = async (req, res) => {
+  const { carId } = req.params
+  const car = await pool.query(
+    'SELECT * FROM cars WHERE car_id = $1',
+    [carId]
+  )
+  if (car.rows.length === 0) {
+    throw new NotFoundError(`No item with id ${carId} was found`)
+  }
+  res.status(StatusCodes.OK).json({
+    car: car.rows
+  })
+}
+
+const updateCar = async (req, res) => {
+  const { params: { carId }, user: { userId } } = req
+  const { make, model, description, rentalPrice } = req.body
+  checkCarFields(make, model, description, rentalPrice)
+  const car = await pool.query(
+    'SELECT * FROM cars WHERE car_id = $1',
+    [carId]
+  )
+  if (car.rows.length === 0) {
+    throw new NotFoundError(`No item with id ${carId} was found`)
+  }
+  const now = new Date()
+  const updatedCar = await pool.query(
+    `UPDATE cars SET  make=$1, model=$2, description=$3, rental_price=$4,
+    availability_dates=$5, updated_on=$6 WHERE car_id=$7 AND user_id=$8 RETURNING *`,
+    [make, model, description, rentalPrice, now, now, carId, userId]
+  )
+  if (updatedCar.rows.length === 0) {
+    throw new NotFoundError(`No item with id ${carId} was found`)
+  }
+  res.status(StatusCodes.OK).json({
+    car: updatedCar.rows
+  })
+}
+
 module.exports = {
   getAllCars,
-  createCar
+  getSingleCar,
+  createCar,
+  updateCar
 }
