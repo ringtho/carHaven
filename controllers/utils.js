@@ -20,8 +20,8 @@ const hashPassword = async (password) => {
   return await bcrypt.hash(password, salt)
 }
 
-const decodePassword = async (rawPassword, password) => {
-  return await bcrypt.compare(rawPassword, password)
+const decodePassword = async (password, rawPassword) => {
+  return await bcrypt.compare(password, rawPassword)
 }
 
 const createJwt = (id, name) => {
