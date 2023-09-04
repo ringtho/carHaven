@@ -1,11 +1,6 @@
 const { StatusCodes } = require('http-status-codes')
 const { checkCarFields } = require('./utils')
 const pool = require('../db/db')
-const { UnAuthorizedError } = require('../errors')
-
-const getAllCars = async (req, res) => {
-  res.status(StatusCodes.OK).json({ msg: 'All Cars' })
-}
 
 const createCar = async (req, res) => {
   const { userId } = req.user
@@ -19,6 +14,16 @@ const createCar = async (req, res) => {
     [make, model, description, rentalPrice, now, userId, now, now]
   )
   res.status(StatusCodes.CREATED).json({ car: car.rows })
+}
+
+const getAllCars = async (req, res) => {
+  const cars = await pool.query(
+    'SELECT * FROM cars ORDER BY updated_on DESC'
+  )
+  res.status(StatusCodes.OK).json({
+    cars: cars.rows,
+    count: cars.rows.length
+  })
 }
 
 module.exports = {

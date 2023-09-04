@@ -5,6 +5,6 @@ const { getAllCars, createCar } = require('../controllers/cars')
 
 router.route('/')
   .post(authMiddlware, createCar)
-  .get(authMiddlware, getAllCars)
+  .get(getAllCars)
 
 module.exports = router
