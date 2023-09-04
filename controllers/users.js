@@ -1,12 +1,12 @@
 const { StatusCodes } = require('http-status-codes')
-const { checkFields, hashPassword, createJwt, decodePassword } = require('./utils')
+const { checkUserFields, hashPassword, createJwt, decodePassword } = require('./utils')
 const pool = require('../db/db')
 const { BadRequestError, UnAuthorizedError } = require('../errors')
 
 const register = async (req, res) => {
   const { email, name, password, roleId } = req.body
   const now = new Date()
-  checkFields(email, name, password)
+  checkUserFields(email, name, password)
   let role
   if (!roleId) {
     role = 3

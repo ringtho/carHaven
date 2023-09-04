@@ -2,7 +2,7 @@ const { BadRequestError } = require('../errors')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
-const checkFields = (email, name, password) => {
+const checkUserFields = (email, name, password) => {
   if (!email) {
     throw new BadRequestError('Please provide an email')
   }
@@ -12,6 +12,23 @@ const checkFields = (email, name, password) => {
 
   if (!password) {
     throw new BadRequestError('Please provide a password')
+  }
+}
+
+const checkCarFields = (make, model, description, rentalPrice) => {
+  if (!make) {
+    throw new BadRequestError('Please provide the make of the car')
+  }
+  if (!model) {
+    throw new BadRequestError('Please provide the model of the car')
+  }
+
+  if (!description) {
+    throw new BadRequestError('Please provide a description to the car')
+  }
+
+  if (!rentalPrice) {
+    throw new BadRequestError('Please provide a rental price for the car')
   }
 }
 
@@ -34,8 +51,9 @@ const createJwt = (id, name, roleId) => {
 }
 
 module.exports = {
-  checkFields,
+  checkUserFields,
   createJwt,
   hashPassword,
-  decodePassword
+  decodePassword,
+  checkCarFields
 }
