@@ -8,8 +8,8 @@ const authenticateUser = async (req, res, next) => {
   }
   const token = authHeader.split(' ')[1]
   try {
-    const { userId, name } = jwt.verify(token, process.env.JWT_SECRET)
-    req.user = { userId, name }
+    const { userId, name, roleId } = jwt.verify(token, process.env.JWT_SECRET)
+    req.user = { userId, name, roleId }
     next()
   } catch (error) {
     throw new UnAuthorizedError('Authentication Invalid')

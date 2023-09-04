@@ -24,9 +24,9 @@ const decodePassword = async (password, rawPassword) => {
   return await bcrypt.compare(password, rawPassword)
 }
 
-const createJwt = (id, name) => {
+const createJwt = (id, name, roleId) => {
   const token = jwt.sign(
-    { userId: id, name },
+    { userId: id, name, roleId },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRY }
   )
