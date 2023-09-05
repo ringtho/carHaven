@@ -8,6 +8,7 @@ const cors = require('cors')
 
 const userRouter = require('./routes/users')
 const carRouter = require('./routes/cars')
+const bookingRouter = require('./routes/bookings')
 
 const errorHandlerMiddleware = require('./middleware/error-handler')
 const notFoundMiddleware = require('./middleware/not-found')
@@ -20,6 +21,7 @@ app.get('/api/v1', (req, res) => {
 
 app.use('/api/v1/auth', userRouter)
 app.use('/api/v1/cars', carRouter)
+app.use('/api/v1/bookings', bookingRouter)
 
 app.use(notFoundMiddleware)
 app.use(errorHandlerMiddleware)

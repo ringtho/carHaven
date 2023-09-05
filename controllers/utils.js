@@ -32,6 +32,23 @@ const checkCarFields = (make, model, description, rentalPrice) => {
   }
 }
 
+const checkBookingFields = (carId, price, bookingDate, returnDate) => {
+  if (!carId) {
+    throw new BadRequestError('Please provide the carId')
+  }
+  if (!bookingDate) {
+    throw new BadRequestError('Please provide the booking date')
+  }
+
+  if (!returnDate) {
+    throw new BadRequestError('Please provide the returning date')
+  }
+
+  if (!price) {
+    throw new BadRequestError('Please provide the booking price')
+  }
+}
+
 const hashPassword = async (password) => {
   const salt = await bcrypt.genSalt(10)
   return await bcrypt.hash(password, salt)
@@ -55,5 +72,6 @@ module.exports = {
   createJwt,
   hashPassword,
   decodePassword,
-  checkCarFields
+  checkCarFields,
+  checkBookingFields
 }
