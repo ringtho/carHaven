@@ -73,10 +73,10 @@ const deleteCar = async (req, res) => {
     [carId, userId]
   )
   if (car.rows.length === 0) {
-    throw new NotFoundError(`No item with id ${carId} was found`)
+    throw new NotFoundError(`No car with id ${carId} was found`)
   }
   res.status(StatusCodes.OK).json({
-    msg: `Successfully deleted item with id: ${carId}`
+    msg: `Successfully deleted car with id: ${carId}`
   })
 }
 

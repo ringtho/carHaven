@@ -4,7 +4,8 @@ const authMiddleware = require('../middleware/authentication')
 const {
   createBooking,
   getAllBookings,
-  getSingleBooking
+  getSingleBooking,
+  cancelBooking
 } = require('../controllers/bookings')
 
 router.route('/')
@@ -13,5 +14,6 @@ router.route('/')
 
 router.route('/:id')
   .get(authMiddleware, getSingleBooking)
+  .delete(authMiddleware, cancelBooking)
 
 module.exports = router

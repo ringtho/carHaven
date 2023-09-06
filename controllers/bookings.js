@@ -4,6 +4,16 @@ const { BadRequestError, NotFoundError } = require('../errors')
 const { checkCarExists } = require('./cars')
 const { checkBookingFields } = require('./utils')
 
+const checkBookingExists = async (bookingId) => {
+  const booking = await pool.query(
+    'SELECT * FROM bookings WHERE booking_id = $1', [bookingId]
+  )
+  if (booking.rows.length === 0) {
+    throw new NotFoundError(`Not found booking with id: ${bookingId}`)
+  }
+  return booking
+}
+
 const createBooking = async (req, res) => {
   const { carId, price, bookingDate, returnDate } = req.body
   const { userId } = req.user
@@ -33,19 +43,34 @@ const getAllBookings = async (req, res) => {
 
 const getSingleBooking = async (req, res) => {
   const bookingId = req.params.id
-  const car = await pool.query(
-    'SELECT * FROM bookings WHERE booking_id = $1', [bookingId]
+  const booking = await checkBookingExists(bookingId)
+  res.status(StatusCodes.OK).json(booking.rows[0])
+}
+
+const cancelBooking = async (req, res) => {
+  const { userId } = req.user
+  const bookingId = req.params.id
+  await checkBookingExists(bookingId)
+  const bookingResult = await pool.query(
+    'DELETE FROM bookings WHERE booking_id = $1 AND user_id = $2 RETURNING *',
+    [bookingId, userId]
   )
-
-  if (car.rows.length === 0) {
-    throw new NotFoundError(`Not found booking with id: ${bookingId}`)
+  const booking = bookingResult.rows[0]
+  if (!booking) {
+    throw new NotFoundError(`No booking with id ${bookingId} was found`)
   }
-
-  res.status(StatusCodes.OK).json(car.rows[0])
+  const { car_id: carId } = booking
+  await checkCarExists(carId)
+  await pool.query(
+    'UPDATE cars SET available=true WHERE car_id = $1', [carId]
+  )
+  res.status(StatusCodes.OK)
+    .json({ msg: `Successfully deleted booking with id: ${bookingId}` })
 }
 
 module.exports = {
   createBooking,
   getAllBookings,
-  getSingleBooking
+  getSingleBooking,
+  cancelBooking
 }
