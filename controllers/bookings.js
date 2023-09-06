@@ -43,8 +43,29 @@ const getAllBookings = async (req, res) => {
 
 const getSingleBooking = async (req, res) => {
   const bookingId = req.params.id
-  const booking = await checkBookingExists(bookingId)
-  res.status(StatusCodes.OK).json(booking.rows[0])
+  const bookingResult = await checkBookingExists(bookingId)
+  const booking = bookingResult.rows[0]
+  res.status(StatusCodes.OK).json({ booking })
+}
+
+const updateBooking = async (req, res) => {
+  const { userId } = req.user
+  const { bookingDate, returnDate } = req.body
+  if (!bookingDate || !returnDate) {
+    throw new BadRequestError('Please provide a booking date or return date')
+  }
+  const bookingId = req.params.id
+  await checkBookingExists(bookingId)
+  const bookingResult = await pool.query(
+    `UPDATE bookings SET booking_date=$1, return_date=$2 
+    WHERE user_id=$3 AND booking_id=$4 RETURNING *`,
+    [bookingDate, returnDate, userId, bookingId]
+  )
+  const booking = bookingResult.rows[0]
+  if (!booking) {
+    throw new BadRequestError(`No booking with id ${bookingId} was found`)
+  }
+  res.status(StatusCodes.OK).json({ booking })
 }
 
 const cancelBooking = async (req, res) => {
@@ -72,5 +93,6 @@ module.exports = {
   createBooking,
   getAllBookings,
   getSingleBooking,
-  cancelBooking
+  cancelBooking,
+  updateBooking
 }

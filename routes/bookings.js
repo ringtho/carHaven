@@ -5,7 +5,8 @@ const {
   createBooking,
   getAllBookings,
   getSingleBooking,
-  cancelBooking
+  cancelBooking,
+  updateBooking
 } = require('../controllers/bookings')
 
 router.route('/')
@@ -15,5 +16,6 @@ router.route('/')
 router.route('/:id')
   .get(authMiddleware, getSingleBooking)
   .delete(authMiddleware, cancelBooking)
+  .patch(authMiddleware, updateBooking)
 
 module.exports = router
