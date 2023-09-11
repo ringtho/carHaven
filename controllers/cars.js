@@ -55,6 +55,12 @@ const getSingleCar = async (req, res) => {
   res.status(StatusCodes.OK).json(car.rows[0])
 }
 
+// const getCarsByUser = asyn (req, res) => {
+//   const cars = await pool.query(
+//     'SELECT * FROM cars WHERE user_id=$1', []
+//   )
+// }
+
 const updateCar = async (req, res) => {
   const { params: { carId }, user: { userId } } = req
   const { make, model, description, rentalPrice, available } = req.body

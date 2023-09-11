@@ -89,10 +89,38 @@ const cancelBooking = async (req, res) => {
     .json({ msg: `Successfully deleted booking with id: ${bookingId}` })
 }
 
+const getBookingsByCar = async (req, res) => {
+  const { carId } = req.params
+  const bookingsResult = await pool.query(
+    'SELECT * FROM bookings WHERE car_id = $1', [carId]
+  )
+  const bookings = bookingsResult.rows
+  if (!bookings[0]) {
+    throw new NotFoundError(`No bookings for car with id ${carId}`)
+  }
+
+  res.status(StatusCodes.OK).json({ bookings, count: bookings.length })
+}
+
+const getBookingsByUser = async (req, res) => {
+  const { userId } = req.params
+  const bookingsResult = await pool.query(
+    'SELECT * FROM bookings WHERE user_id = $1', [userId]
+  )
+  const bookings = bookingsResult.rows
+  if (!bookings[0]) {
+    throw new NotFoundError(`No bookings for user with id ${userId}`)
+  }
+
+  res.status(StatusCodes.OK).json({ bookings, count: bookings.length })
+}
+
 module.exports = {
   createBooking,
   getAllBookings,
   getSingleBooking,
   cancelBooking,
-  updateBooking
+  updateBooking,
+  getBookingsByCar,
+  getBookingsByUser
 }

@@ -9,6 +9,7 @@ const {
   updateCar,
   deleteCar
 } = require('../controllers/cars')
+const { getBookingsByCar } = require('../controllers/bookings')
 
 router.route('/')
   .post(authMiddleware, createCar)
@@ -19,5 +20,7 @@ router.route('/:carId')
   .get(getSingleCar)
   .put(authMiddleware, updateCar)
   .delete(authMiddleware, deleteCar)
+router.route('/:carId/bookings')
+  .get(getBookingsByCar)
 
 module.exports = router
