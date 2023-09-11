@@ -39,6 +39,16 @@ const getAllCars = async (req, res) => {
   })
 }
 
+const getAvailableCars = async (req, res) => {
+  const cars = await pool.query(
+    'SELECT * FROM cars WHERE available=true ORDER BY updated_on DESC'
+  )
+  res.status(StatusCodes.OK).json({
+    cars: cars.rows,
+    count: cars.rows.length
+  })
+}
+
 const getSingleCar = async (req, res) => {
   const { carId } = req.params
   const car = await checkCarExists(carId)
@@ -83,6 +93,7 @@ const deleteCar = async (req, res) => {
 module.exports = {
   getAllCars,
   getSingleCar,
+  getAvailableCars,
   createCar,
   updateCar,
   deleteCar,

@@ -6,6 +6,7 @@ const app = express()
 
 const cors = require('cors')
 
+const authRouter = require('./routes/auth')
 const userRouter = require('./routes/users')
 const carRouter = require('./routes/cars')
 const bookingRouter = require('./routes/bookings')
@@ -19,7 +20,8 @@ app.get('/api/v1', (req, res) => {
   res.status(200).send('Car Rental API')
 })
 
-app.use('/api/v1/auth', userRouter)
+app.use('/api/v1/auth', authRouter)
+app.use('/api/v1/users', userRouter)
 app.use('/api/v1/cars', carRouter)
 app.use('/api/v1/bookings', bookingRouter)
 

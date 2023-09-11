@@ -5,6 +5,7 @@ const {
   getAllCars,
   createCar,
   getSingleCar,
+  getAvailableCars,
   updateCar,
   deleteCar
 } = require('../controllers/cars')
@@ -12,6 +13,8 @@ const {
 router.route('/')
   .post(authMiddleware, createCar)
   .get(getAllCars)
+router.route('/available')
+  .get(getAvailableCars)
 router.route('/:carId')
   .get(getSingleCar)
   .put(authMiddleware, updateCar)

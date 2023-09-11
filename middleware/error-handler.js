@@ -7,7 +7,7 @@ const errorHandler = (err, req, res, next) => {
   }
 
   if (err.code === '22P02') {
-    console.log(err.length)
+    console.log(err)
     return res.status(StatusCodes.NOT_FOUND).json({
       msg: `No item with id ${err} was found`
     })

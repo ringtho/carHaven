@@ -1,48 +1,29 @@
 const { StatusCodes } = require('http-status-codes')
-const { checkUserFields, hashPassword, createJwt, decodePassword } = require('./utils')
 const pool = require('../db/db')
-const { BadRequestError, UnAuthorizedError } = require('../errors')
+const { UnAuthorizedError, NotFoundError } = require('../errors')
+const {
+  hashPassword,
+  decodePassword
+} = require('./utils')
 
-const register = async (req, res) => {
-  const { email, name, password, roleId } = req.body
-  const now = new Date()
-  checkUserFields(email, name, password)
-  let role
-  if (!roleId) {
-    role = 3
-  } else {
-    role = roleId
-  }
-  const newPassword = await hashPassword(password)
-  const user = await pool.query(
-    `INSERT INTO users (name, email, password, role_id, created_on, last_login)
-    VALUES ($1, $2, $3, $4, $5, $6)
-    RETURNING user_id, name, email, created_on, last_login`,
-    [name, email, newPassword, role, now, now]
-  )
-  const { id, name: fullName } = user.rows[0]
-  const token = createJwt(id, fullName, role)
-  res.status(StatusCodes.CREATED).json({ user: { name: fullName }, token })
+const getAllUsers = async (req, res) => {
+  const usersResult = await pool.query(
+    'SELECT * FROM users ORDER BY name DESC')
+  const users = usersResult.rows
+  res.status(StatusCodes.OK).json({ users, count: users.length })
 }
 
-const login = async (req, res) => {
-  const { email, password } = req.body
-  if (!email || !password) {
-    throw new BadRequestError('Please provide an email or password')
-  }
-  const user = await pool.query(
-    'SELECT * FROM users WHERE email = $1', [email]
+const getUserProfile = async (req, res) => {
+  const { userId } = req.user
+  const userResult = await pool.query(
+    `SELECT name, email, last_login, created_on, role_id 
+    FROM users WHERE user_id=$1`, [userId]
   )
-  if (user.rows.length === 0) {
-    throw new UnAuthorizedError('Incorrect username or password')
+  const user = userResult.rows[0]
+  if (!user) {
+    throw NotFoundError(`User with id: ${userId} not found`)
   }
-  const { user_id: id, name, password: rawPassword, role_id: role } = user.rows[0]
-  const isPasswordCorrect = await decodePassword(password, rawPassword)
-  if (!isPasswordCorrect) {
-    throw new UnAuthorizedError('Incorrect username or password')
-  }
-  const token = createJwt(id, name, role)
-  res.status(StatusCodes.CREATED).json({ user: { name }, token })
+  res.status(StatusCodes.OK).json({ user })
 }
 
 const updatePassword = async (req, res) => {
@@ -67,7 +48,7 @@ const updatePassword = async (req, res) => {
 }
 
 module.exports = {
-  register,
-  login,
+  getAllUsers,
+  getUserProfile,
   updatePassword
 }
