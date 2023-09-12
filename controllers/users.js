@@ -6,6 +6,17 @@ const {
   decodePassword
 } = require('./utils')
 
+const checkUserExists = async (userId) => {
+  const userResult = await pool.query(
+    'SELECT * FROM users WHERE user_id=$1', [userId]
+  )
+  const user = userResult.rows[0]
+  if (!user) {
+    throw new NotFoundError(`No user with id: ${userId}`)
+  }
+  return user
+}
+
 const getAllUsers = async (req, res) => {
   const usersResult = await pool.query(
     'SELECT * FROM users ORDER BY name DESC')
@@ -50,5 +61,6 @@ const updatePassword = async (req, res) => {
 module.exports = {
   getAllUsers,
   getUserProfile,
+  checkUserExists,
   updatePassword
 }

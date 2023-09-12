@@ -7,6 +7,7 @@ const {
   getAllUsers
 } = require('../controllers/users')
 const { getBookingsByUser } = require('../controllers/bookings')
+const { getReviewsByUser } = require('../controllers/reviews')
 
 router.route('/')
   .get(authMiddlware, getAllUsers)
@@ -16,4 +17,6 @@ router.route('/update-password')
   .patch(authMiddlware, updatePassword)
 router.route('/:userId/bookings')
   .get(getBookingsByUser)
+router.route('/:userId/reviews')
+  .get(getReviewsByUser)
 module.exports = router

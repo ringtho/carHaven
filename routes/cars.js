@@ -10,6 +10,7 @@ const {
   deleteCar
 } = require('../controllers/cars')
 const { getBookingsByCar } = require('../controllers/bookings')
+const { getReviewsByCar } = require('../controllers/reviews')
 
 router.route('/')
   .post(authMiddleware, createCar)
@@ -22,5 +23,7 @@ router.route('/:carId')
   .delete(authMiddleware, deleteCar)
 router.route('/:carId/bookings')
   .get(getBookingsByCar)
+router.route('/:carId/reviews')
+  .get(getReviewsByCar)
 
 module.exports = router

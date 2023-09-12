@@ -3,6 +3,7 @@ const pool = require('../db/db')
 const { BadRequestError, NotFoundError } = require('../errors')
 const { checkCarExists } = require('./cars')
 const { checkBookingFields } = require('./utils')
+const { checkUserExists } = require('./users')
 
 const checkBookingExists = async (bookingId) => {
   const booking = await pool.query(
@@ -91,6 +92,7 @@ const cancelBooking = async (req, res) => {
 
 const getBookingsByCar = async (req, res) => {
   const { carId } = req.params
+  await checkCarExists(carId)
   const bookingsResult = await pool.query(
     'SELECT * FROM bookings WHERE car_id = $1', [carId]
   )
@@ -104,6 +106,7 @@ const getBookingsByCar = async (req, res) => {
 
 const getBookingsByUser = async (req, res) => {
   const { userId } = req.params
+  await checkUserExists(userId)
   const bookingsResult = await pool.query(
     'SELECT * FROM bookings WHERE user_id = $1', [userId]
   )
