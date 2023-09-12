@@ -23,6 +23,15 @@ const createReview = async (req, res) => {
   res.status(StatusCodes.CREATED).json({ review })
 }
 
+const getAllReviews = async (req, res) => {
+  const reviewsResult = pool.query('SELECT * FROM reviews')
+  const reviews = (await reviewsResult).rows
+  if (reviews.length === 0) {
+    throw new NotFoundError('There are currently no reviews')
+  }
+  res.status(StatusCodes.OK).json({ reviews, count: reviews.length })
+}
+
 const getReviewsByCar = async (req, res) => {
   const { id: carId } = req.params
   await checkCarExists(carId)
@@ -30,7 +39,7 @@ const getReviewsByCar = async (req, res) => {
     'SELECT * FROM reviews WHERE car_id = $1', [carId]
   )
   const reviews = reviewsResult.rows
-  if (!reviews.count) {
+  if (reviews.length === 0) {
     throw new NotFoundError('This car has not been reviewed yet')
   }
   res.status(StatusCodes.OK).json({ reviews, count: reviews.length })
@@ -38,5 +47,6 @@ const getReviewsByCar = async (req, res) => {
 
 module.exports = {
   createReview,
-  getReviewsByCar
+  getReviewsByCar,
+  getAllReviews
 }
