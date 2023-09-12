@@ -10,7 +10,7 @@ const checkCarExists = async (carId) => {
     [carId]
   )
   if (car.rows.length === 0) {
-    throw new NotFoundError(`No item with id ${carId} was found`)
+    throw new NotFoundError(`No car with id ${carId} was found`)
   }
   return car
 }

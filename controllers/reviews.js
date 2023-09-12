@@ -1,5 +1,5 @@
 const { StatusCodes } = require('http-status-codes')
-const { BadRequestError } = require('../errors')
+const { BadRequestError, NotFoundError } = require('../errors')
 const pool = require('../db/db')
 const { checkCarExists } = require('./cars')
 
@@ -23,6 +23,20 @@ const createReview = async (req, res) => {
   res.status(StatusCodes.CREATED).json({ review })
 }
 
+const getReviewsByCar = async (req, res) => {
+  const { id: carId } = req.params
+  await checkCarExists(carId)
+  const reviewsResult = await pool.query(
+    'SELECT * FROM reviews WHERE car_id = $1', [carId]
+  )
+  const reviews = reviewsResult.rows
+  if (!reviews.count) {
+    throw new NotFoundError('This car has not been reviewed yet')
+  }
+  res.status(StatusCodes.OK).json({ reviews, count: reviews.length })
+}
+
 module.exports = {
-  createReview
+  createReview,
+  getReviewsByCar
 }
