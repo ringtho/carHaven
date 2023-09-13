@@ -27,7 +27,7 @@ const createBooking = async (req, res) => {
   const bookingResult = await pool.query(
     `INSERT INTO bookings (car_id, user_id, price, booking_date, return_date)
     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-    [carId, userId, price, bookingDate, returnDate]
+    [carId, userId, price, new Date(bookingDate), new Date(returnDate)]
   )
 
   await pool.query(
@@ -60,7 +60,7 @@ const updateBooking = async (req, res) => {
   const bookingResult = await pool.query(
     `UPDATE bookings SET booking_date=$1, return_date=$2 
     WHERE user_id=$3 AND booking_id=$4 RETURNING *`,
-    [bookingDate, returnDate, userId, bookingId]
+    [new Date(bookingDate), new Date(returnDate), userId, bookingId]
   )
   const booking = bookingResult.rows[0]
   if (!booking) {
@@ -125,5 +125,6 @@ module.exports = {
   cancelBooking,
   updateBooking,
   getBookingsByCar,
-  getBookingsByUser
+  getBookingsByUser,
+  checkBookingExists
 }
